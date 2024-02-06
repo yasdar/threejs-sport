@@ -1,0 +1,23 @@
+html,
+body {
+  background-color: lightblue;
+  height: 100%;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+}
+.canvasDiv {
+  width: 80%;
+  margin-left: 5%;
+  margin-top: 2%;
+  border-style: solid;
+  border-color: red;
+}
+#canvas {
+  outline: none;
+  height: 100%;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+}
