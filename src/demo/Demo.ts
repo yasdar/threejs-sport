@@ -3,10 +3,12 @@ import * as THREE from 'three'
 import { Box } from './Box'
 import { Experience } from '../engine/Experience'
 import { Resource } from '../engine/Resources'
-import github from '../../assets/github.png'
+//import github from '../../assets/github.png'
+import { Terrain } from './Terrain'
 
 export class Demo implements Experience {
   resources: Resource[] = []
+  terrain!: Terrain
   box!: Box
   spot1!: THREE.SpotLight
   spot1Helper!: THREE.SpotLightHelper
@@ -43,7 +45,7 @@ export class Demo implements Experience {
     //gridHelper.rotateZ(Math.PI/2)
     this.engine.scene.add(gridHelper)
 
-    const plane = new THREE.Mesh(
+    /*const plane = new THREE.Mesh(
       new THREE.PlaneGeometry(14, 4),
       new THREE.MeshStandardMaterial({
         color: 0xffffff,
@@ -54,7 +56,7 @@ export class Demo implements Experience {
     plane.rotation.x = -Math.PI / 2
     plane.receiveShadow = true
     this.engine.scene.add(plane)
-
+*/
     /* const plane2 = new THREE.Mesh(
       new THREE.PlaneGeometry(1,2),
       new THREE.MeshStandardMaterial({ color: 0xffffff})
@@ -70,11 +72,11 @@ export class Demo implements Experience {
 
     let directionalLight = new THREE.DirectionalLight(0xffffff)
     directionalLight.castShadow = true
-    directionalLight.position.set(-6, 15, 0)
+    directionalLight.position.set(0, 10, 0)
     this.engine.scene.add(directionalLight)
     directionalLight.shadow.camera.bottom = -4
 
-    // this.engine.scene.add(new THREE.DirectionalLightHelper(directionalLight));
+    this.engine.scene.add(new THREE.DirectionalLightHelper(directionalLight))
     //this.engine.scene.add(new THREE.CameraHelper(directionalLight.shadow.camera));
 
     /* this.spot1 =  new THREE.SpotLight(0xffffff,10,20);//,Math.PI/7
@@ -92,10 +94,15 @@ export class Demo implements Experience {
     this.engine.scene.add(new THREE.SpotLightHelper(spot2));*/
     //this.engine.scene.add(new THREE.CameraHelper(spot2.shadow.camera));
 
+    this.terrain = new Terrain()
+    this.terrain.castShadow = true
+    this.terrain.position.set(0, 0.2, 0)
+    this.engine.scene.add(this.terrain)
+
     this.box = new Box()
     this.box.castShadow = true
     //box.rotation.y = Math.PI / 4
-    this.box.position.set(0, 2.5, 0)
+    this.box.position.set(0, 1.5, 0)
     this.spot_options = {
       penumbra: 0,
       intensity: 10,

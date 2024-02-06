@@ -1,6 +1,5 @@
 import { WebGLRenderer } from 'three'
 import { Engine } from './Engine'
-import * as THREE from 'three'
 import { GameEntity } from './GameEntity'
 import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer'
 import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass'

@@ -21,7 +21,7 @@ export class Camera implements GameEntity {
     )
     this.instance.position.z = 10
     this.instance.position.x = 0
-    this.instance.position.y = 2
+    this.instance.position.y = 4
     this.engine.scene.add(this.instance)
   }
 
@@ -31,8 +31,8 @@ export class Camera implements GameEntity {
     this.controls.maxPolarAngle = Math.PI / 2 - Math.PI / 20
 
     //zoom
-    this.controls.minDistance = 3 //camera z = 3
-    //this.controls.maxDistance = 10 //camera z = 7
+    this.controls.minDistance = 6 //camera z = 3
+    this.controls.maxDistance = 20 //camera z = 7
 
     this.controls.update()
   }
