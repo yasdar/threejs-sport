@@ -32,7 +32,7 @@ export class Demo implements Experience {
     this.engine.scene.background = a;
   })*/
 
-    const axesHelper: THREE.AxesHelper = new THREE.AxesHelper(6)
+    const axesHelper: THREE.AxesHelper = new THREE.AxesHelper(15)
     this.engine.scene.add(axesHelper)
     const Xcolor = new THREE.Color(0xffffff)
     const Ycolor = new THREE.Color(0x00ff00)

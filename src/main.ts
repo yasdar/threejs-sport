@@ -1,4 +1,6 @@
 import './style.scss'
+import 'bootstrap/dist/css/bootstrap.min.css'
+
 import { Engine } from './engine/Engine'
 import { Demo } from './demo/Demo'
 
