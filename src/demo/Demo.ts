@@ -1,4 +1,5 @@
 import { Engine } from '../engine/Engine'
+import $ from 'jquery'
 import * as THREE from 'three'
 import { Box } from './Box'
 import { Experience } from '../engine/Experience'
@@ -13,6 +14,9 @@ export class Demo implements Experience {
   spot1!: THREE.SpotLight
   spot1Helper!: THREE.SpotLightHelper
   spot_options: any
+
+  ray_caster!: THREE.Raycaster
+  mousePosition!: THREE.Vector2
   constructor(private engine: Engine) {}
 
   init() {
@@ -30,6 +34,15 @@ export class Demo implements Experience {
     cubeTextTureLoader.load([BG,BG,BG,BG,BG,BG],(a:any)=>{
       //console.log(a);
     this.engine.scene.background = a;
+  })*/
+    /*const mousePositions = new  THREE.Vector2();
+  $('#canvas').on('mousedown touchstart', (P:any) => {
+    mousePositions.set(
+      (P.clientX/this.engine.sizes.width)*2 -1,
+      -(P.clientY/this.engine.sizes.height)*2 +1
+      );
+    console.log(mousePositions)
+    console.log(P.clientX,P.clientY)
   })*/
 
     const axesHelper: THREE.AxesHelper = new THREE.AxesHelper(15)
@@ -95,14 +108,16 @@ export class Demo implements Experience {
     //this.engine.scene.add(new THREE.CameraHelper(spot2.shadow.camera));
 
     this.terrain = new Terrain()
+    this.terrain.name = 'terrain'
     this.terrain.castShadow = true
     this.terrain.position.set(0, 0.2, 0)
     this.engine.scene.add(this.terrain)
-
+    // console.log("terrain id",this.terrain.id)
     this.box = new Box()
+    this.box.name = 'box!'
     this.box.castShadow = true
     //box.rotation.y = Math.PI / 4
-    this.box.position.set(0, 1.5, 0)
+    this.box.position.set(0, 0, 0)
     this.spot_options = {
       penumbra: 0,
       intensity: 10,
@@ -112,6 +127,8 @@ export class Demo implements Experience {
       angle: 1.0471975511965976,
       distance: 20,
     }
+    console.log('box id', this.box.id)
+
     this.engine.debug.gui
       .add(this.box.position, 'x', -8, 8)
       .listen()
@@ -134,12 +151,46 @@ export class Demo implements Experience {
     this.engine.debug.gui.add(this.spot_options, 'distance', -30, 30)
 
     this.engine.scene.add(this.box)
+
+    this.mousePosition = new THREE.Vector2()
+    $('#canvas').on('mousemove', (event) => {
+      this.mousePosition.x = (event.clientX / this.engine.sizes.width) * 2 - 1
+      this.mousePosition.y = -(event.clientY / this.engine.sizes.height) * 2 + 1
+      // console.log(this.mousePosition)
+    })
+    this.ray_caster = new THREE.Raycaster()
   }
 
   resize() {}
 
   update() {
-    this.box.rotation.y += 0.01
+    // this.box.rotation.y += 0.01
+    if (
+      this.mousePosition &&
+      this.engine.camera.instance &&
+      this.engine.scene &&
+      this.ray_caster
+    ) {
+      this.ray_caster.setFromCamera(
+        this.mousePosition,
+        this.engine.camera.instance
+      )
+      const intersetcs = this.ray_caster.intersectObjects(
+        this.engine.scene.children
+      )
+
+      if (intersetcs) {
+        for (let i: number = 0; i < intersetcs.length; i++) {
+          if (intersetcs[i].object.name == 'box!') {
+            intersetcs[i].object.rotation.y += 0.1
+          }
+          if (intersetcs[i].object.name == 'terrain') {
+            // console.log(intersetcs[i].object.getWorldPosition(new THREE.Vector3(0,0,0)))
+            //console.log(intersetcs[i].object.getWorldDirection(new THREE.Vector3(0,0,0)))
+          }
+        }
+      }
+    }
 
     /*this.spot1.position.set( this.spot_options.x, this.spot_options.y, this.spot_options.z);
     this.spot1.angle =  this.spot_options.angle;

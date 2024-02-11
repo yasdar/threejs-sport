@@ -68,6 +68,7 @@ export class Engine {
     this.camera.update()
     this.renderEngine.update()
     this.experience.update(delta)
+    this.raycaster.update()
     this.debug.update()
   }
 

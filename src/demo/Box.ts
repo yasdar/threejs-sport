@@ -7,7 +7,7 @@ import * as THREE from 'three'
 export class Box extends THREE.Mesh {
   constructor() {
     // console.log(vertexShader)
-    const geometry = new THREE.BoxGeometry(0.5, 0.5, 0.5)
+    const geometry = new THREE.BoxGeometry(1, 1, 1)
     /*const material = new THREE.ShaderMaterial({
       vertexShader,
       fragmentShader,
@@ -39,7 +39,7 @@ export class Box extends THREE.Mesh {
     const material = new THREE.MeshStandardMaterial({
       //wireframe:true,
       color: 0xffff00,
-      transparent: true,
+      transparent: false,
       opacity: 1,
     })
 

@@ -11,24 +11,28 @@ export class Raycaster extends EventEmitter {
     this.raycaster = new THREE.Raycaster()
     this.pointer = new THREE.Vector2()
 
-    document.addEventListener('mousemove', (event) => {
+    /* document.addEventListener('mousemove', (event) => {
+    
       const x = (event.clientX / this.engine.sizes.width) * 2 - 1
       const y = -(event.clientY / this.engine.sizes.height) * 2 + 1
-      this.setPointer(x, y)
+      this.setPointer(x, y);
+
       if (this.listenerCount('move')) {
+        console.log('move')
         this.emit('move', this.getIntersections())
       }
-    })
+    })*/
 
-    document.addEventListener('click', (event) => {
+    /*document.addEventListener('click', (event) => {
       if (!(event.target instanceof HTMLCanvasElement)) return
       const point = this.mouseEventToVector2(event)
-      this.setPointer(point.x, point.y)
+      this.setPointer(point.x, point.y);
       this.update()
       if (this.listenerCount('click')) {
+  
         this.emit('click', this.getIntersections())
       }
-    })
+    })*/
   }
 
   public update() {
