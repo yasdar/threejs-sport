@@ -18,7 +18,7 @@ export class Terrain extends THREE.Mesh {
     ]
 
     // const textTureLoader = new THREE.TextureLoader();
-
+    /*
     const material = new THREE.MeshStandardMaterial({
       //wireframe:true,
       color: 0xff0000,
@@ -28,7 +28,7 @@ export class Terrain extends THREE.Mesh {
       // color:0xffffff,
       // opacity:1,
       // map:textTureLoader.load(grass1)
-    })
+    })*/
 
     super(geometry, materials)
     // this.rotation.x = -Math.PI / 2

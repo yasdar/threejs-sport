@@ -48,9 +48,9 @@ export class Raycaster extends EventEmitter {
     return this.raycaster.intersectObjects(this.engine.scene.children, true)
   }
 
-  private mouseEventToVector2(event: MouseEvent) {
+  /*private mouseEventToVector2(event: MouseEvent) {
     const x = (event.clientX / this.engine.sizes.width) * 2 - 1
     const y = -(event.clientY / this.engine.sizes.height) * 2 + 1
     return new THREE.Vector2(x, y)
-  }
+  }*/
 }

@@ -37,10 +37,10 @@ export class Box extends THREE.Mesh {
     });*/
 
     const material = new THREE.MeshStandardMaterial({
-      //wireframe:true,
-      color: 0xffff00,
+      wireframe: true,
+      color: 0xffffff,
       transparent: false,
-      opacity: 1,
+      opacity: 0,
     })
 
     super(geometry, material)

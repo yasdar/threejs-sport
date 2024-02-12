@@ -8,11 +8,13 @@ body {
   /* overflow: hidden;*/
 }
 .canvasDiv {
+  position: relative;
   width: 80%;
   margin-left: 0%;
   margin-top: 0%;
   border-style: solid;
   border-color: red;
+  background-color: black;
 }
 #canvas {
   outline: none;
@@ -20,4 +22,38 @@ body {
   width: 100%;
   margin: 0;
   padding: 0;
+}
+.rightTools {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 128px;
+  height: calc(100% - 50px);
+  background-color: rgba(128, 128, 128, 0.5);
+  border: 2px solid grey;
+  border-radius: 8px;
+  padding: 5px;
+}
+.content-two img {
+  cursor: pointer;
+}
+.bottomTools {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  height: 48px;
+  background-color: rgba(128, 128, 128, 0.5);
+  border: 2px solid grey;
+  border-radius: 8px;
+  padding: 5px;
+}
+#bt_rotateC {
+  transform: rotate(180deg);
+}
+#bt_rotateCX {
+  transform: rotate(90deg);
+}
+#bt_rotateACX {
+  transform: rotate(-90deg);
 }

@@ -6,6 +6,7 @@ import { Experience } from '../engine/Experience'
 import { Resource } from '../engine/Resources'
 //import github from '../../assets/github.png'
 import { Terrain } from './Terrain'
+import { Ob1 } from './ob1'
 
 export class Demo implements Experience {
   resources: Resource[] = []
@@ -17,6 +18,8 @@ export class Demo implements Experience {
 
   ray_caster!: THREE.Raycaster
   mousePosition!: THREE.Vector2
+  rollOverMesh!: THREE.Mesh
+  pointerIsDown: boolean = false
   constructor(private engine: Engine) {}
 
   init() {
@@ -53,9 +56,14 @@ export class Demo implements Experience {
     axesHelper.setColors(Xcolor, Ycolor, Zcolor)
 
     const size = 14
-    const divisions = 10
-    const gridHelper = new THREE.GridHelper(size, divisions)
-    //gridHelper.rotateZ(Math.PI/2)
+    const divisions = 28
+    const gridHelper = new THREE.GridHelper(
+      size,
+      divisions,
+      new THREE.Color(0xffff00),
+      new THREE.Color(0xffff00)
+    )
+    gridHelper.position.y = 0.4
     this.engine.scene.add(gridHelper)
 
     /*const plane = new THREE.Mesh(
@@ -85,7 +93,7 @@ export class Demo implements Experience {
 
     let directionalLight = new THREE.DirectionalLight(0xffffff)
     directionalLight.castShadow = true
-    directionalLight.position.set(0, 10, 0)
+    directionalLight.position.set(0, 7, 2)
     this.engine.scene.add(directionalLight)
     directionalLight.shadow.camera.bottom = -4
 
@@ -113,11 +121,18 @@ export class Demo implements Experience {
     this.terrain.position.set(0, 0.2, 0)
     this.engine.scene.add(this.terrain)
     // console.log("terrain id",this.terrain.id)
-    this.box = new Box()
+
+    /*const _ob1 = new Ob1();
+    _ob1.position.set(0, 2, 0)
+    this.engine.scene.add(_ob1)*/
+
+    /*this.box = new Box()
     this.box.name = 'box!'
     this.box.castShadow = true
     //box.rotation.y = Math.PI / 4
-    this.box.position.set(0, 0, 0)
+    this.box.position.set(0.5, 0, 0)
+    this.engine.scene.add(this.box)*/
+
     this.spot_options = {
       penumbra: 0,
       intensity: 10,
@@ -127,15 +142,23 @@ export class Demo implements Experience {
       angle: 1.0471975511965976,
       distance: 20,
     }
-    console.log('box id', this.box.id)
 
-    this.engine.debug.gui
+    const rollOverGeo = new THREE.BoxGeometry(0.5, 0.5, 0.5)
+    let rollOverMaterial = new THREE.MeshBasicMaterial({
+      color: 0xff0000,
+      opacity: 0.8,
+      transparent: true,
+    })
+    this.rollOverMesh = new THREE.Mesh(rollOverGeo, rollOverMaterial)
+    this.engine.scene.add(this.rollOverMesh)
+
+    /*this.engine.debug.gui
       .add(this.box.position, 'x', -8, 8)
       .listen()
       .onChange((v: number) => {
         this.box.position.x = v
       })
-      .name('Box x')
+      .name('Box x')*/
 
     this.engine.debug.gui.add(this.spot_options, 'penumbra', 0, 1)
     this.engine.debug.gui.add(this.spot_options, 'intensity', 0, 30)
@@ -150,17 +173,64 @@ export class Demo implements Experience {
     )
     this.engine.debug.gui.add(this.spot_options, 'distance', -30, 30)
 
-    this.engine.scene.add(this.box)
-
     this.mousePosition = new THREE.Vector2()
+    this.ray_caster = new THREE.Raycaster()
+
     $('#canvas').on('mousemove', (event) => {
       this.mousePosition.x = (event.clientX / this.engine.sizes.width) * 2 - 1
       this.mousePosition.y = -(event.clientY / this.engine.sizes.height) * 2 + 1
       // console.log(this.mousePosition)
     })
-    this.ray_caster = new THREE.Raycaster()
+
+    $('#canvas').on('pointerdown', (event: any) => {
+      this.pointerIsDown = true
+      console.log('pointerIsDown', this.pointerIsDown)
+      this.mousePosition.x = (event.clientX / this.engine.sizes.width) * 2 - 1
+      this.mousePosition.y = -(event.clientY / this.engine.sizes.height) * 2 + 1
+      // console.log(this.mousePosition)
+    })
+    $('#canvas').on('pointerup', () => {
+      this.pointerIsDown = false
+      console.log('pointerIsDown', this.pointerIsDown)
+      //this.mousePosition.x = (event.clientX / this.engine.sizes.width) * 2 - 1
+      //this.mousePosition.y = -(event.clientY / this.engine.sizes.height) * 2 + 1
+      // console.log(this.mousePosition)
+    })
+
+    $('#car').on('pointerdown', () => {
+      this.addObjectFix(new THREE.Vector3(3, 0.7, 0))
+    })
+  }
+  addObject(intersect: THREE.Intersection) {
+    console.log('add object')
+    /* const map = new THREE.TextureLoader().load( worker );
+				map.colorSpace = THREE.SRGBColorSpace;
+				let cubeGeo = new THREE.BoxGeometry( 0.5, 0.5, 0.5 );
+				let cubeMaterial = new THREE.MeshLambertMaterial( { color: 0xffffff, map: map } );
+
+              const voxel = new THREE.Mesh( cubeGeo, cubeMaterial );
+						  voxel.position.copy( intersect.point );
+						  voxel.position.divideScalar( 0.5).floor().multiplyScalar( 0.5 ).addScalar( 0.5 );
+						  this.engine.scene.add( voxel );*/
+
+    const _ob1 = new Ob1()
+    _ob1.position.copy(intersect.point)
+    _ob1.position.y = 0.7
+    this.engine.scene.add(_ob1)
   }
 
+  addObjectFix(p: THREE.Vector3) {
+    let box = new Box()
+    box.name = 'box_car'
+    box.position.copy(p)
+
+    console.log('add object')
+    const _ob1 = new Ob1()
+    _ob1.position.set(-0.25, 0, 0)
+    box.add(_ob1)
+
+    this.engine.scene.add(box)
+  }
   resize() {}
 
   update() {
@@ -181,12 +251,28 @@ export class Demo implements Experience {
 
       if (intersetcs) {
         for (let i: number = 0; i < intersetcs.length; i++) {
-          if (intersetcs[i].object.name == 'box!') {
+          if (intersetcs[i].object.name == 'box_car') {
+            //intersetcs[i].object.rotation.y += 0.1
+            intersetcs[i].object.position.z += 0.05
+            if (Math.random() * 10 < 5) {
+              intersetcs[i].object.position.x += 0.05
+            }
+          }
+          if (intersetcs[i].object.name == 'cari') {
             intersetcs[i].object.rotation.y += 0.1
           }
           if (intersetcs[i].object.name == 'terrain') {
-            // console.log(intersetcs[i].object.getWorldPosition(new THREE.Vector3(0,0,0)))
-            //console.log(intersetcs[i].object.getWorldDirection(new THREE.Vector3(0,0,0)))
+            if (this.pointerIsDown) {
+              //add object
+              this.pointerIsDown = false
+              //this.addObject(intersetcs[i]);
+            }
+            this.rollOverMesh.position.copy(intersetcs[i].point)
+            this.rollOverMesh.position
+              .divideScalar(0.5)
+              .floor()
+              .multiplyScalar(0.5)
+              .addScalar(0.5)
           }
         }
       }

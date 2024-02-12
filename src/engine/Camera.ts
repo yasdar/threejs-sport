@@ -33,7 +33,7 @@ export class Camera implements GameEntity {
       0.1, //Near
       1000 //Far
     )
-    this.instance.position.set(0, 4, 10)
+    this.instance.position.set(0, 8, 10)
 
     this.engine.scene.add(this.instance)
   }
