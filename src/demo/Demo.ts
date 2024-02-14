@@ -7,6 +7,7 @@ import { Resource } from '../engine/Resources'
 //import github from '../../assets/github.png'
 import { Terrain } from './Terrain'
 import { Ob1 } from './ob1'
+import { AngleBetweenTwoPointsInPlanXZ } from './utils'
 
 export class Demo implements Experience {
   resources: Resource[] = []
@@ -20,6 +21,11 @@ export class Demo implements Experience {
   mousePosition!: THREE.Vector2
   rollOverMesh!: THREE.Mesh
   pointerIsDown: boolean = false
+  selectedObg!: THREE.Object3D | null
+
+  pickableObjects: THREE.Mesh[] = []
+  intersectedObject!: THREE.Object3D | null
+
   constructor(private engine: Engine) {}
 
   init() {
@@ -55,17 +61,7 @@ export class Demo implements Experience {
     const Zcolor = new THREE.Color(0x0000ff)
     axesHelper.setColors(Xcolor, Ycolor, Zcolor)
 
-    const size = 14
-    const divisions = 28
-    const gridHelper = new THREE.GridHelper(
-      size,
-      divisions,
-      new THREE.Color(0xffff00),
-      new THREE.Color(0xffff00)
-    )
-    gridHelper.position.y = 0.4
-    this.engine.scene.add(gridHelper)
-
+    this.addGrid()
     /*const plane = new THREE.Mesh(
       new THREE.PlaneGeometry(14, 4),
       new THREE.MeshStandardMaterial({
@@ -120,6 +116,7 @@ export class Demo implements Experience {
     this.terrain.castShadow = true
     this.terrain.position.set(0, 0.2, 0)
     this.engine.scene.add(this.terrain)
+
     // console.log("terrain id",this.terrain.id)
 
     /*const _ob1 = new Ob1();
@@ -179,18 +176,21 @@ export class Demo implements Experience {
     $('#canvas').on('mousemove', (event) => {
       this.mousePosition.x = (event.clientX / this.engine.sizes.width) * 2 - 1
       this.mousePosition.y = -(event.clientY / this.engine.sizes.height) * 2 + 1
+
       // console.log(this.mousePosition)
     })
 
     $('#canvas').on('pointerdown', (event: any) => {
       this.pointerIsDown = true
+
       console.log('pointerIsDown', this.pointerIsDown)
       this.mousePosition.x = (event.clientX / this.engine.sizes.width) * 2 - 1
       this.mousePosition.y = -(event.clientY / this.engine.sizes.height) * 2 + 1
-      // console.log(this.mousePosition)
     })
     $('#canvas').on('pointerup', () => {
       this.pointerIsDown = false
+      this.engine.camera.controls.enabled = true
+      this.selectedObg = null
       console.log('pointerIsDown', this.pointerIsDown)
       //this.mousePosition.x = (event.clientX / this.engine.sizes.width) * 2 - 1
       //this.mousePosition.y = -(event.clientY / this.engine.sizes.height) * 2 + 1
@@ -198,8 +198,20 @@ export class Demo implements Experience {
     })
 
     $('#car').on('pointerdown', () => {
-      this.addObjectFix(new THREE.Vector3(3, 0.7, 0))
+      this.addObjectFix(new THREE.Vector3(3, 1, 0))
     })
+  }
+  addGrid() {
+    const size = 14
+    const divisions = 28
+    const gridHelper = new THREE.GridHelper(
+      size,
+      divisions,
+      new THREE.Color(0xffff00),
+      new THREE.Color(0xffff00)
+    )
+    gridHelper.position.y = 0.4
+    this.engine.scene.add(gridHelper)
   }
   addObject(intersect: THREE.Intersection) {
     console.log('add object')
@@ -220,16 +232,14 @@ export class Demo implements Experience {
   }
 
   addObjectFix(p: THREE.Vector3) {
-    let box = new Box()
-    box.name = 'box_car'
-    box.position.copy(p)
+    const _ob1: any = new Ob1()
+    _ob1.position.copy(p)
+    this.engine.scene.add(_ob1)
 
-    console.log('add object')
-    const _ob1 = new Ob1()
-    _ob1.position.set(-0.25, 0, 0)
-    box.add(_ob1)
-
-    this.engine.scene.add(box)
+    this.pickableObjects = _ob1.obMesh
+    this.pickableObjects.push(this.terrain)
+    this.pickableObjects.push(_ob1.obgCube)
+    this.pickableObjects.push(_ob1.obgRot)
   }
   resize() {}
 
@@ -245,34 +255,86 @@ export class Demo implements Experience {
         this.mousePosition,
         this.engine.camera.instance
       )
+
+      //const intersects2 =  this.ray_caster.intersectObject( object, true );
+
       const intersetcs = this.ray_caster.intersectObjects(
-        this.engine.scene.children
+        this.pickableObjects,
+        false
       )
+
+      /*const intersetcs = this.ray_caster.intersectObjects(
+        this.engine.scene.children,false
+      )*/
 
       if (intersetcs) {
         for (let i: number = 0; i < intersetcs.length; i++) {
-          if (intersetcs[i].object.name == 'box_car') {
-            //intersetcs[i].object.rotation.y += 0.1
-            intersetcs[i].object.position.z += 0.05
-            if (Math.random() * 10 < 5) {
-              intersetcs[i].object.position.x += 0.05
-            }
+          if (intersetcs[0].object.name == 'obgg') {
+            console.log('higlight', 'obgg')
           }
+
+          if (intersetcs[i].object.name == 'obgCube' && this.pointerIsDown) {
+            console.log('higlight', 'obgCube')
+            this.engine.camera.controls.enabled = false
+            this.selectedObg = intersetcs[i].object.parent.currentObg
+            intersetcs[i].object.parent.currentObg.scale.setScalar(0.22)
+          }
+          if (intersetcs[i].object.name == 'obmove') {
+            //intersetcs[i].object.parent.position.copy(intersetcs[i].point)
+          }
+          if (intersetcs[0].object.name == 'obrot' && this.pointerIsDown) {
+            if (intersetcs[i].object.parent.name == 'player') {
+              this.engine.camera.controls.enabled = false
+              console.log(
+                intersetcs[i].object.parent.position,
+                intersetcs[i].point
+              )
+
+              console.log(
+                '--> obrot',
+                AngleBetweenTwoPointsInPlanXZ(
+                  intersetcs[i].point,
+                  intersetcs[i].object.parent.position
+                )
+              )
+
+              intersetcs[i].object.parent.rotation.y =
+                AngleBetweenTwoPointsInPlanXZ(
+                  intersetcs[i].point,
+                  intersetcs[i].object.parent.position
+                )
+            }
+            //console.log(intersetcs[i].object.parent.name , intersetcs[i].object.parent.position)
+
+            //console.log("intersetc",intersetcs[i].point)
+            //console.log("obg pos",intersetcs[i].object.parent.position);
+            //intersetcs[i].object.parent.rotation.y += 0.1
+            // console.log("mose",this.mousePosition)
+            // console.log("pp",intersetcs[i].object.parent?.position)
+          }
+
           if (intersetcs[i].object.name == 'cari') {
             intersetcs[i].object.rotation.y += 0.1
           }
           if (intersetcs[i].object.name == 'terrain') {
-            if (this.pointerIsDown) {
+            console.log('terrain')
+            if (this.selectedObg) {
               //add object
-              this.pointerIsDown = false
+              //this.pointerIsDown = false
               //this.addObject(intersetcs[i]);
+
+              this.selectedObg.parent.position.copy(intersetcs[i].point)
+              this.selectedObg.parent.position.y = 1
             }
-            this.rollOverMesh.position.copy(intersetcs[i].point)
-            this.rollOverMesh.position
+            // console.log('----------comparing-------')
+            //console.log("rollOverMesh",this.rollOverMesh.position)
+            // console.log("intersetc",intersetcs[i].point)
+            //this.rollOverMesh.position.copy(intersetcs[i].point)
+            /* this.rollOverMesh.position
               .divideScalar(0.5)
               .floor()
               .multiplyScalar(0.5)
-              .addScalar(0.5)
+              .addScalar(0.5)*/
           }
         }
       }

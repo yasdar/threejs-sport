@@ -7,7 +7,7 @@ import { GameEntity } from './GameEntity'
 
 export class Camera implements GameEntity {
   public instance!: THREE.PerspectiveCamera
-  private controls!: OrbitControls
+  public controls!: OrbitControls
 
   //bar controle
   private _rotateC: boolean = false
@@ -67,7 +67,10 @@ export class Camera implements GameEntity {
   }
 
   update() {
-    this.controls.update()
+    if (this.controls) {
+      this.controls.update()
+    }
+
     if (this._rotateC) {
       this.rotateC()
     }

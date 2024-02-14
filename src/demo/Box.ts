@@ -3,7 +3,7 @@ import * as THREE from 'three'
 //import fragmentShader from './shader.frag'
 //import github from '../../assets/github.png'
 //import twitter from '../../assets/twitter.png'
-
+//
 export class Box extends THREE.Mesh {
   constructor() {
     // console.log(vertexShader)
@@ -36,7 +36,7 @@ export class Box extends THREE.Mesh {
      map:textTureLoader.load(github)
     });*/
 
-    const material = new THREE.MeshStandardMaterial({
+    const material = new THREE.MeshBasicMaterial({
       wireframe: true,
       color: 0xffffff,
       transparent: false,
